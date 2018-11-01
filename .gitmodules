@@ -7,3 +7,6 @@
 [submodule "picosha2"]
 	path = third-party/picosha2
 	url = https://github.com/okdshin/PicoSHA2.git
+[submodule "tools/codecov"]
+	path = tools/codecov
+	url = https://github.com/RWTH-HPC/CMake-codecov.git
