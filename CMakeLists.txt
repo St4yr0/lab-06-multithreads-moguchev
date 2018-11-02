@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include("tools/gate/cmake/HunterGate.cmake")
@@ -11,7 +11,7 @@ huntergate(
 )
 
 project(template) # rename project and delete this comment
-string(APPEND CMAKE_CXX_FLAGS " -pedantic -Wall -Wextra")
+string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
 string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
 
