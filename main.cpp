@@ -71,7 +71,7 @@ void init(const std::string &logfilename) {
 void search_correct_hash(int i, std::mutex *mtx) {
     init("Log.log");
 
-    while (true) {
+    for (size_t i = 0; i < 65535; ++i) {
         std::vector<byte> data{
             (unsigned char)std::rand(), (unsigned char)std::rand(),
             (unsigned char)std::rand(), (unsigned char)std::rand() };
