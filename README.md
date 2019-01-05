@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/bmstu-iu8-31-cpp-2018/lab-06-multithreads-moguchev.svg?branch=wp%2Flab)](https://travis-ci.com/bmstu-iu8-31-cpp-2018/lab-06-multithreads-moguchev)
 # Лабораторная работа №6
 
 ## Задание
