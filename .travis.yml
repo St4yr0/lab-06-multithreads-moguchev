@@ -7,9 +7,9 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
+    - libstdc++-7-dev
     - g++-7
-    - lcov
-    - gcovr
+    update: true
 
 cache:
   apt: true
@@ -23,27 +23,18 @@ before_install:
 - export CC=$CC_EVAL
 - pip install --user cpplint
 
+script:
+- files=`find . -name "*.cpp" -or -name "*.hpp" -or -name ".h" | grep -v "./tools/*" | grep -v "./third-party/*"`
+# sanitaizer check
+- ( for file in $files; do cpplint --filter=-build/c++11,-runtime/references,-whitespace/braces,-whitespace/indent,-whitespace/comments,-build/include_order $file || exit; done );
+- ./tools/polly/bin/polly --reconfig --toolchain sanitize-address --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
+# clang-check
+- ./tools/polly/bin/polly --reconfig --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold" CMAKE_EXPORT_COMPILE_COMMANDS=ON
+- ( for file in $files; do echo $file; clang-check -analyze $file -p _builds/default-Release || exit; done );
+# tests
+- export CTEST_OUTPUT_ON_FAILURE=true
+- ./tools/polly/bin/polly --reconfig --test --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
 # CMAKE_EXE_LINKER need to bugfix: https://stackoverflow.com/questions/50024731/ld-unrecognized-option-push-state-no-as-needed
-jobs:
-  include:
-    - name: "tests"
-      script:
-      - export CTEST_OUTPUT_ON_FAILURE=true
-      - ./tools/polly/bin/polly --reconfig --test --config-all Debug --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
-      # coverage logging
-      - ./tools/polly/bin/polly --reconfig --toolchain gcc-7-cxx17 --config-all Debug --test --fwd ENABLE_COVERAGE=yes
-      - ./tools/polly/bin/polly --reconfig --toolchain gcc-7-cxx17 --config-all Debug --target gcov
-      - gcovr -r  .
-    
-    - name: "checks"
-      script:
-      - files=`find . -name "*.cpp" -or -name "*.hpp" -or -name ".h" | grep -v "./tools/*"`
-      - filter=-build/c++11,-runtime/references,-whitespace/braces,-whitespace/indent,-whitespace/comments,-build/include_order
-      - echo $files | xargs cpplint --filter=$filter
-      # sanitaizer check
-      - ./tools/polly/bin/polly --reconfig --toolchain sanitize-address-cxx17 --config-all Debug --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
-      - ./tools/polly/bin/polly --reconfig --toolchain sanitize-leak-cxx17    --config-all Debug --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
-      - ./tools/polly/bin/polly --reconfig --toolchain sanitize-thread-cxx17  --config-all Debug --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
 
 notifications:
   email: false
